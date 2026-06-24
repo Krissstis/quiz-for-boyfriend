@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🎯 УГАДАЙ МЕНЯ!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: linear-gradient(135deg, #2d1b4e 0%, #4a2c6e 50%, #2d1b4e 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
+    padding: 16px;
+    touch-action: manipulation;
+}
+
+        .container {
+    max-width: 480px;
+    width: 100%;
+    background: rgba(60, 40, 90, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid #ff00a0;
+    border-radius: 32px;
+    padding: 28px 22px;
+    box-shadow: 0 0 60px rgba(255, 0, 160, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 0, 160, 0.05), transparent, rgba(0, 200, 255, 0.05), transparent);
+            animation: rotate 25s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #page1 {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        #page1 .emoji-big {
+            font-size: 72px;
+            display: block;
+            margin-bottom: 16px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-16px); }
+        }
+
+        #page1 h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: #ff00a0;
+            text-shadow: 0 0 30px #ff00a0;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        #page1 .sub {
+            color: #a0f0ff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        #page1 .desc {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 16px 0 24px;
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #ff00a0, #a000ff);
+            border: none;
+            padding: 18px 40px;
+            border-radius: 60px;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 40px rgba(255, 0, 160, 0.3);
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-start:active {
+            transform: scale(0.95);
+        }
+
+        #page2 {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #2a1a3a;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00a0, #a000ff);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .question-counter {
+            color: #888;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+
+        .question-text {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        .question-text .highlight {
+            color: #ff00a0;
+        }
+
+        .photo-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .photo-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid #3a2a4a;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            aspect-ratio: 1/1;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .photo-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-option .photo-label {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .photo-option:active:not(.disabled) {
+            transform: scale(0.95);
+        }
+
+        .photo-option.correct {
+            border-color: #00ff88 !important;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3) !important;
+        }
+
+        .photo-option.correct .photo-label {
+            background: rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+
+        .photo-option.wrong {
+            border-color: #ff0044 !important;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.3) !important;
+        }
+
+        .photo-option.wrong .photo-label {
+            background: rgba(255, 0, 68, 0.3);
+            color: #ff0044;
+        }
+
+        .photo-option.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .photo-option.disabled:active {
+            transform: none !important;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #3a2a4a;
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #ddd;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:active:not(.disabled) {
+            transform: scale(0.97);
+            border-color: #ff00a0;
+        }
+
+        .option-btn .letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            background: #2a1a3a;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            color: #ff00a0;
+        }
+
+        .option-btn.correct {
+            border-color: #00ff88 !important;
+            background: rgba(0, 255, 136, 0.12) !important;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15) !important;
+        }
+
+        .option-btn.wrong {
+            border-color: #ff0044 !important;
+            background: rgba(255, 0, 68, 0.12) !important;
+            box-shadow: 0 0 20px rgba(255, 0, 68, 0.15) !important;
+        }
+
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .option-btn.disabled:active {
+            transform: none !important;
+        }
+
+        .feedback {
+            margin: 12px 0 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            min-height: 50px;
+            display: none;
+            animation: fadeSlide 0.35s ease;
+            word-break: break-word;
+        }
+
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(-8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.good {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #ffffff;
+        }
+
+        .feedback.bad {
+            background: rgba(255, 0, 68, 0.1);
+            border: 2px solid #ff0044;
+            color: #ff0044;
+        }
+
+        .feedback.neutral {
+            background: rgba(255, 200, 0, 0.1);
+            border: 2px solid #ffcc00;
+            color: #ffcc00;
+        }
+
+        .feedback.love {
+            background: rgba(255, 0, 160, 0.12);
+            border: 2px solid #ff00a0;
+            color: #ff69b4;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .feedback.swap {
+            background: rgba(255, 200, 0, 0.12);
+            border: 2px solid #ffcc00;
+            color: #ffcc00;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-next {
+            background: #2a1a3a;
+            border: 2px solid #ff00a0;
+            color: white;
+            padding: 16px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            display: none;
+            width: 100%;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-next:active {
+            background: #ff00a0;
+            color: #000;
+            transform: scale(0.97);
+        }
+
+        #page3 {
+            display: none;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        #page3 .result-emoji {
+            font-size: 72px;
+            margin-bottom: 12px;
+        }
+
+        #page3 .result-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        #page3 .result-title.gold { color: #ffd700; text-shadow: 0 0 30px #ffd700; }
+        #page3 .result-title.silver { color: #c0c0c0; text-shadow: 0 0 30px #c0c0c0; }
+        #page3 .result-title.bronze { color: #cd7f32; text-shadow: 0 0 30px #cd7f32; }
+        #page3 .result-title.loser { color: #ff0044; text-shadow: 0 0 30px #ff0044; }
+
+        #page3 .result-desc {
+            color: #aaa;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 16px 0 24px;
+        }
+
+        .btn-restart {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid #555;
+            color: #aaa;
+            padding: 16px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            width: 100%;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-restart:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.97);
+        }
+
+        .love-options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 16px 0;
+            min-height: 200px;
+            position: relative;
+            align-items: center;
+        }
+
+        .love-btn {
+            padding: 18px 20px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            border: 3px solid #3a2a4a;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Montserrat', sans-serif;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .love-btn.yes {
+            border-color: #ff00a0;
+            color: #ff00a0;
+            background: rgba(255, 0, 160, 0.08);
+        }
+
+        .love-btn.yes:active:not(.disabled) {
+            background: rgba(255, 0, 160, 0.2);
+            transform: scale(0.96);
+        }
+
+        .love-btn.no {
+            border-color: #ff0044;
+            color: #ff0044;
+            background: rgba(255, 0, 68, 0.05);
+            transition: all 0.15s ease;
+            cursor: default;
+        }
+
+        .love-btn.no:active {
+            transform: none !important;
+        }
+
+        .love-btn.correct {
+            border-color: #00ff88 !important;
+            background: rgba(0, 255, 136, 0.2) !important;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2) !important;
+        }
+
+        .love-btn.wrong {
+            border-color: #ff0044 !important;
+            background: rgba(255, 0, 68, 0.2) !important;
+        }
+
+        .love-btn.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .love-btn.disabled:active {
+            transform: none !important;
+        }
+
+        .love-btn.swapped-yes {
+            border-color: #ff00a0 !important;
+            color: #ff00a0 !important;
+            background: rgba(255, 0, 160, 0.08) !important;
+        }
+
+        .love-btn.swapped-no {
+            border-color: #ff0044 !important;
+            color: #ff0044 !important;
+            background: rgba(255, 0, 68, 0.05) !important;
+        }
+
+        @media (min-width: 500px) {
+            .love-options {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .love-btn {
+                width: auto;
+                min-width: 180px;
+                padding: 20px 40px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container { padding: 20px 16px; }
+            #page1 h1 { font-size: 1.2rem; }
+            .question-text { font-size: 1rem; }
+            .option-btn { font-size: 0.8rem; padding: 12px 14px; min-height: 44px; }
+            .love-btn { font-size: 1.2rem; padding: 16px; min-height: 56px; }
+            .btn-start { font-size: 0.85rem; padding: 16px; }
+            .feedback { font-size: 0.9rem; padding: 12px 14px; }
+            .photo-options { gap: 8px; }
+            .photo-option .photo-label { font-size: 0.6rem; padding: 2px 10px; bottom: 4px; }
+        }
+
+        @media (max-width: 360px) {
+            .container { padding: 16px 12px; border-radius: 24px; }
+            .question-text { font-size: 0.9rem; }
+            .option-btn { font-size: 0.75rem; padding: 10px 12px; min-height: 40px; }
+            .option-btn .letter { width: 24px; height: 24px; min-width: 24px; font-size: 0.7rem; margin-right: 8px; }
+        }
+
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(22px, env(safe-area-inset-left));
+                padding-right: max(22px, env(safe-area-inset-right));
+                padding-top: max(28px, env(safe-area-inset-top));
+                padding-bottom: max(28px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div id="page1">
+        <span class="emoji-big">🚨</span>
+        <h1>ТЫ ПОПАЛ!</h1>
+        <div class="sub">Добро пожаловать на допрос</div>
+        <div class="desc">
+            Сейчас ты проверишь, насколько хорошо ты меня знаешь.<br>
+            <span style="color: #ff00a0;">Думай</span>, прежде чем нажать.<br>
+            И помни: <span style="color: #a0f0ff;">Кристина всё видит</span> 👀
+        </div>
+        <button class="btn-start" onclick="startQuiz()">🎯 НАЧНЁМ!</button>
+    </div>
+
+    <div id="page2">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="question-counter" id="questionCounter">Вопрос 1 из 6</div>
+        <div class="question-text" id="questionText">Загрузка...</div>
+        <div id="optionsContainer"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="btn-next" id="btnNext" onclick="nextQuestion()">ДАЛЬШЕ ➜</button>
+    </div>
+
+    <div id="page3">
+        <div class="result-emoji" id="resultEmoji">🏆</div>
+        <div class="result-title" id="resultTitle">Супер!</div>
+        <div class="result-desc" id="resultDesc">Ты знаешь меня идеально!</div>
+        <button class="btn-restart" onclick="restartQuiz()">🔄 Пройти заново</button>
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    // 🔥 СЮДА ВСТАВЬ СВОИ ПУТИ К ФОТО
+    // ============================================================
+    const photoFiles = [
+    'photo1.jpg',   // Твоё фото
+    'photo2.jpg',   // НЕ ТВОЁ ← ПРАВИЛЬНЫЙ ОТВЕТ!
+    'photo3.jpg',   // Твоё фото
+    'photo4.jpg'    // Твоё фото
+];
+
+    // Номер правильного фото (индекс в массиве, начиная с 0)
+    // photo2.jpg — это индекс 1 (НЕ ТВОЁ)
+    const CORRECT_PHOTO_INDEX = 1;
+    // ============================================================
+
+    const questions = [
+        {
+            question: 'Какое из этих фото НЕ я? 👀',
+            options: photoFiles,
+            correct: [CORRECT_PHOTO_INDEX],
+            feedbackCorrect: ['🔥 ВАУ! Ты угадал! Это реально НЕ я! А ты внимательный! 😍'],
+            feedbackWrong: '😅 Мда... А это первый вопрос только)) Это как раз я! Учись лучше!',
+            isMulti: false,
+            isLove: false,
+            isPhoto: true
+        },
+        {
+            question: 'Какой вещи у меня НЕТ в гардеробе?',
+            options: ['Клетчатая юбка', 'Красный свитер', 'Кожаная куртка', 'Синий купальник'],
+            correct: [2],
+            feedbackCorrect: ['👏 БРАВО! 2ой вопрос и правильный!'],
+            feedbackWrong: '😬 Второй подряд не верно... Понятно...',
+            isMulti: false,
+            isLove: false,
+            isPhoto: false,
+            feedbackCorrectIfPrevWrong: '😏 Вай, исправляешься! Молодец!',
+            feedbackWrongIfPrevCorrect: '😐 Ладно, еще есть моменты наверстать...'
+        },
+        {
+            question: 'Была ли я в Сочи?',
+            options: ['Да', 'Нет', 'Проездом', '🆘 ТЫК СЮДА если не знаешь (пока Кристина не видит)'],
+            correct: [1],
+            feedbackCorrect: ['💛 Да ты мой Золотой! Мур!'],
+            feedbackWrong: '😅 Мда... не угадал(',
+            feedbackEmergency: '😎 Сделаем вид, что никто не заметил...',
+            emergencyIndex: 3,
+            isMulti: false,
+            isLove: false,
+            isPhoto: false
+        },
+        {
+            question: 'Какое у меня было хобби в школьные времена?',
+            options: ['Рисование', 'Танцы', 'Акробатика', 'Кружок "Умелые ручки"'],
+            correct: [2, 3],
+            feedbackCorrect: [
+                '🤸‍♀️ Да! Акробатикой я занималась с 3 по 9 класс! 🔥',
+                '✂️ Да! В кружок "Умелые ручки" я ходила с 5 по 9 класс! 🔥'
+            ],
+            feedbackWrong: {
+                0: '🎨 Рисование? Ну, я рисую как курица лапой, так что нет 😂',
+                1: '💃 Танцы? Я танцую только под настроение, а в школе стеснялась 😅'
+            },
+            isMulti: true,
+            isLove: false,
+            isPhoto: false,
+            hintAfterFirstCorrect: '🤭 Но тут есть ещё один правильный вариант! Попробуй найти!'
+        },
+        {
+            question: 'Что я взяла с собой на необитаемый остров?',
+            options: ['📱 Телефон', '🐱 Кота', '❤️ Тебя', '📖 Книгу "Как выжить на необитаемом острове"'],
+            correct: [1],
+            feedbackCorrect: ['🐱 Конечно же КОТА! Я бы без кота не выжила! 😂 А тебя я бы и так взяла, но в вариантах не было такого... 😘'],
+            feedbackWrong: {
+                0: '📱 Телефон? На необитаемом острове без розетки? Ну ты даёшь! 😂',
+                2: '❤️ Тебя? Мило, но я бы взяла КОТА! Ты бы и сам приплыл за мной! 😂',
+                3: '📖 Книгу? Я и так знаю, что делать! Главное — найти кота! 😸'
+            },
+            isMulti: false,
+            isLove: false,
+            isPhoto: false
+        },
+        {
+            question: 'Ты меня любишь? ❤️',
+            options: ['ДА! ❤️', 'НЕТ! 😈'],
+            correct: [0],
+            feedbackCorrect: ['😭❤️ Я ТЕБЯ ТОЖЕ! Ты прошёл главный тест! Ты мой герой! 🥹💕'],
+            feedbackWrong: '😤 Ну и ладно! А я тебя люблю всё равно! 😘',
+            isMulti: false,
+            isLove: true,
+            isPhoto: false
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+    let prevCorrect = null;
+    let selectedOptions = [];
+    let firstCorrectChosen = false;
+    let escapeInterval = null;
+    let buttonsSwapped = false;
+
+    function startQuiz() {
+        document.getElementById('page1').style.display = 'none';
+        document.getElementById('page2').style.display = 'block';
+        currentQuestion = 0;
+        score = 0;
+        prevCorrect = null;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        answered = false;
+        selectedOptions = [];
+        firstCorrectChosen = false;
+        buttonsSwapped = false;
+        document.getElementById('questionCounter').textContent = `Вопрос ${currentQuestion + 1} из ${questions.length}`;
+        document.getElementById('questionText').innerHTML = q.question;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('btnNext').style.display = 'none';
+
+        if (escapeInterval) {
+            clearInterval(escapeInterval);
+            escapeInterval = null;
+        }
+
+        const progress = ((currentQuestion) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+
+        if (q.isPhoto) {
+            container.className = 'photo-options';
+            const labels = ['Фото 1', 'Фото 2', 'Фото 3', 'Фото 4'];
+            
+            q.options.forEach((src, index) => {
+                const div = document.createElement('div');
+                div.className = 'photo-option';
+                div.dataset.index = index;
+                
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = labels[index];
+                img.onerror = function() {
+                    this.outerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1a1a2a;color:#ff0044;font-size:0.7rem;text-align:center;padding:10px;">❌<br>Фото не найдено</div>`;
+                };
+                
+                const label = document.createElement('span');
+                label.className = 'photo-label';
+                label.textContent = labels[index];
+                
+                div.appendChild(img);
+                div.appendChild(label);
+                div.onclick = () => selectPhotoOption(index);
+                container.appendChild(div);
+            });
+        }
+        else if (q.isLove) {
+            container.className = 'love-options';
+            
+            const yesBtn = document.createElement('button');
+            yesBtn.className = 'love-btn yes';
+            yesBtn.id = 'yesBtn';
+            yesBtn.textContent = 'ДА! ❤️';
+            yesBtn.onclick = () => selectLoveOption(0);
+            container.appendChild(yesBtn);
+
+            const noBtn = document.createElement('button');
+            noBtn.className = 'love-btn no';
+            noBtn.id = 'noBtn';
+            noBtn.textContent = 'НЕТ! 😈';
+            noBtn.onclick = () => selectLoveOption(1);
+            
+            container.appendChild(noBtn);
+            
+            startMadness(noBtn);
+        } 
+        else {
+            container.className = 'options';
+            const letters = ['А', 'Б', 'В', 'Г'];
+            q.options.forEach((text, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span class="letter">${letters[index]}</span>${text}`;
+                btn.dataset.index = index;
+                
+                if (q.isMulti) {
+                    btn.onclick = () => selectMultiOption(index);
+                } else {
+                    btn.onclick = () => selectOption(index);
+                }
+                
+                container.appendChild(btn);
+            });
+        }
+    }
+
+    function selectPhotoOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const q = questions[currentQuestion];
+        const options = document.querySelectorAll('.photo-option');
+        const feedback = document.getElementById('feedback');
+
+        const isCorrect = q.correct.includes(index);
+
+        if (isCorrect) {
+            score++;
+            feedback.className = 'feedback good';
+            feedback.textContent = q.feedbackCorrect[0];
+        } else {
+            feedback.className = 'feedback bad';
+            feedback.textContent = q.feedbackWrong;
+        }
+
+        feedback.style.display = 'block';
+
+        options.forEach((el, i) => {
+            el.classList.add('disabled');
+            if (q.correct.includes(i)) {
+                el.classList.add('correct');
+            } else if (i === index && !isCorrect) {
+                el.classList.add('wrong');
+            }
+        });
+
+        if (currentQuestion === 0) {
+            prevCorrect = isCorrect;
+        }
+
+        const btnNext = document.getElementById('btnNext');
+        btnNext.style.display = 'block';
+        if (currentQuestion === questions.length - 1) {
+            btnNext.textContent = '📊 УЗНАТЬ РЕЗУЛЬТАТ';
+        } else {
+            btnNext.textContent = 'ДАЛЬШЕ ➜';
+        }
+
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function selectOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const q = questions[currentQuestion];
+        const buttons = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback');
+
+        let isCorrect = q.correct.includes(index);
+        let feedbackText = '';
+
+        if (currentQuestion === 1) {
+            if (prevCorrect === true) {
+                if (isCorrect) {
+                    feedbackText = q.feedbackCorrectIfPrevCorrect || q.feedbackCorrect[0];
+                } else {
+                    feedbackText = q.feedbackWrongIfPrevCorrect || q.feedbackWrong;
+                }
+            } else {
+                if (isCorrect) {
+                    feedbackText = q.feedbackCorrectIfPrevWrong || '😏 Вай, исправляешься! Молодец!';
+                } else {
+                    feedbackText = q.feedbackWrong;
+                }
+            }
+        }
+        else if (currentQuestion === 2 && index === q.emergencyIndex) {
+            isCorrect = false;
+            feedbackText = q.feedbackEmergency;
+            feedback.className = 'feedback neutral';
+        }
+        else {
+            if (isCorrect) {
+                feedbackText = q.feedbackCorrect[0];
+                feedback.className = 'feedback good';
+            } else {
+                if (typeof q.feedbackWrong === 'object') {
+                    feedbackText = q.feedbackWrong[index] || '❌ Не угадал!';
+                } else {
+                    feedbackText = q.feedbackWrong;
+                }
+                feedback.className = 'feedback bad';
+            }
+        }
+
+        if (isCorrect && !(currentQuestion === 2 && index === q.emergencyIndex)) {
+            score++;
+        }
+
+        if (currentQuestion === 0) {
+            prevCorrect = isCorrect;
+        }
+
+        feedback.textContent = feedbackText;
+        feedback.style.display = 'block';
+
+        buttons.forEach((btn, i) => {
+            btn.classList.add('disabled');
+            if (q.correct.includes(i)) {
+                btn.classList.add('correct');
+            } else if (i === index && !isCorrect) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        const btnNext = document.getElementById('btnNext');
+        btnNext.style.display = 'block';
+        if (currentQuestion === questions.length - 1) {
+            btnNext.textContent = '📊 УЗНАТЬ РЕЗУЛЬТАТ';
+        } else {
+            btnNext.textContent = 'ДАЛЬШЕ ➜';
+        }
+
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function selectMultiOption(index) {
+        const q = questions[currentQuestion];
+        const buttons = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback');
+
+        if (answered) return;
+        if (selectedOptions.includes(index)) return;
+
+        const isCorrect = q.correct.includes(index);
+
+        if (!isCorrect) {
+            feedback.className = 'feedback bad';
+            feedback.textContent = q.feedbackWrong[index] || '❌ Неа, не угадал!';
+            feedback.style.display = 'block';
+            
+            buttons[index].classList.add('wrong');
+            buttons[index].classList.add('disabled');
+            return;
+        }
+
+        selectedOptions.push(index);
+        buttons[index].classList.add('correct');
+        buttons[index].classList.add('disabled');
+
+        if (selectedOptions.length === 1) {
+            feedback.className = 'feedback good';
+            feedback.textContent = q.feedbackCorrect[index] + ' ' + q.hintAfterFirstCorrect;
+            feedback.style.display = 'block';
+            firstCorrectChosen = true;
+            return;
+        }
+
+        if (selectedOptions.length === 2) {
+            answered = true;
+            
+            feedback.className = 'feedback good';
+            feedback.textContent = q.feedbackCorrect[index] + ' 🎉 Ты нашёл оба варианта! Гений!';
+            feedback.style.display = 'block';
+
+            buttons.forEach((btn, i) => {
+                btn.classList.add('disabled');
+                if (q.correct.includes(i)) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            const btnNext = document.getElementById('btnNext');
+            btnNext.style.display = 'block';
+            btnNext.textContent = '📊 УЗНАТЬ РЕЗУЛЬТАТ';
+            
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            score++;
+        }
+    }
+
+    function selectLoveOption(index) {
+        if (answered) return;
+
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const feedback = document.getElementById('feedback');
+
+        if (index === 1 && !buttonsSwapped) {
+            yesBtn.textContent = 'НЕТ! 😈';
+            yesBtn.className = 'love-btn swapped-no';
+            yesBtn.onclick = () => selectLoveOption(1);
+
+            noBtn.textContent = 'ДА! ❤️';
+            noBtn.className = 'love-btn swapped-yes';
+            noBtn.onclick = () => selectLoveOption(0);
+            
+            if (escapeInterval) {
+                clearInterval(escapeInterval);
+                escapeInterval = null;
+            }
+            
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0px';
+            noBtn.style.top = '0px';
+            noBtn.style.transform = 'scale(1) rotate(0deg)';
+            noBtn.style.opacity = '1';
+            noBtn.style.fontSize = '1.4rem';
+            
+            buttonsSwapped = true;
+            
+            feedback.className = 'feedback swap';
+            feedback.textContent = '😈 ХА! Ты нажал на "НЕТ"! Кнопки поменялись! Попробуй ещё... 🤪';
+            feedback.style.display = 'block';
+            
+            return;
+        }
+
+        if (buttonsSwapped && index === 1) {
+            yesBtn.textContent = 'ДА! ❤️';
+            yesBtn.className = 'love-btn yes';
+            yesBtn.onclick = () => selectLoveOption(0);
+
+            noBtn.textContent = 'НЕТ! 😈';
+            noBtn.className = 'love-btn no';
+            noBtn.onclick = () => selectLoveOption(1);
+            
+            startMadness(noBtn);
+            
+            buttonsSwapped = false;
+            
+            feedback.className = 'feedback swap';
+            feedback.textContent = '🤯 А ТАК! Снова поменял! Поймай момент! 😂';
+            feedback.style.display = 'block';
+            
+            return;
+        }
+
+        answered = true;
+
+        if (escapeInterval) {
+            clearInterval(escapeInterval);
+            escapeInterval = null;
+        }
+
+        const q = questions[currentQuestion];
+        
+        let isCorrect = false;
+        if (!buttonsSwapped && index === 0) isCorrect = true;
+        if (buttonsSwapped && index === 1) isCorrect = true;
+
+        if (isCorrect) {
+            score++;
+            feedback.className = 'feedback love';
+            feedback.textContent = '😭❤️ Я ТЕБЯ ТОЖЕ! Ты прошёл главный тест! Ты мой герой! 🥹💕';
+            yesBtn.classList.add('correct');
+            yesBtn.classList.add('disabled');
+            noBtn.classList.add('disabled');
+            noBtn.style.transform = 'scale(1) rotate(0deg)';
+            noBtn.style.left = '0px';
+            noBtn.style.top = '0px';
+            noBtn.style.opacity = '0.5';
+        } else {
+            feedback.className = 'feedback love';
+            feedback.textContent = '😤 Ну и ладно! А я тебя люблю всё равно! 😘';
+            noBtn.classList.add('wrong');
+            noBtn.classList.add('disabled');
+            yesBtn.classList.add('disabled');
+        }
+
+        feedback.style.display = 'block';
+
+        const btnNext = document.getElementById('btnNext');
+        btnNext.style.display = 'block';
+        btnNext.textContent = '📊 УЗНАТЬ РЕЗУЛЬТАТ';
+        
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function startMadness(btn) {
+        const container = document.querySelector('.love-options');
+        const containerWidth = container.offsetWidth || 400;
+        const containerHeight = container.offsetHeight || 200;
+        const btnWidth = btn.offsetWidth || 180;
+        const btnHeight = btn.offsetHeight || 64;
+
+        if (escapeInterval) {
+            clearInterval(escapeInterval);
+        }
+
+        escapeInterval = setInterval(() => {
+            if (btn.classList.contains('disabled') || answered) {
+                clearInterval(escapeInterval);
+                return;
+            }
+
+            const randomAction = Math.floor(Math.random() * 10);
+            const maxX = Math.max(0, containerWidth - btnWidth - 10);
+            const maxY = Math.max(0, containerHeight - btnHeight - 10);
+
+            switch(randomAction) {
+                case 0:
+                case 1:
+                case 2:
+                    const x = Math.random() * maxX;
+                    const y = Math.random() * maxY;
+                    btn.style.position = 'relative';
+                    btn.style.left = Math.max(0, Math.min(maxX, x)) + 'px';
+                    btn.style.top = Math.max(0, Math.min(maxY, y)) + 'px';
+                    btn.style.transform = 'scale(1) rotate(0deg)';
+                    btn.style.opacity = '1';
+                    break;
+                case 3:
+                    btn.style.transform = 'scale(1) rotate(' + (Math.random() * 360 - 180) + 'deg)';
+                    btn.style.left = '0px';
+                    btn.style.top = '0px';
+                    break;
+                case 4:
+                    const scale = 0.2 + Math.random() * 0.3;
+                    btn.style.transform = 'scale(' + scale + ') rotate(' + (Math.random() * 60 - 30) + 'deg)';
+                    btn.style.left = '0px';
+                    btn.style.top = '0px';
+                    break;
+                case 5:
+                    const bigScale = 1.1 + Math.random() * 0.5;
+                    btn.style.transform = 'scale(' + bigScale + ') rotate(' + (Math.random() * 20 - 10) + 'deg)';
+                    btn.style.left = '0px';
+                    btn.style.top = '0px';
+                    break;
+                case 6:
+                    const colors = ['#ff0044', '#ff6600', '#ffcc00', '#00ff88', '#0088ff', '#ff00ff', '#ffffff'];
+                    btn.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+                    btn.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    break;
+                case 7:
+                    btn.style.transform = 'translate(' + (Math.random() * 16 - 8) + 'px, ' + (Math.random() * 16 - 8) + 'px) rotate(' + (Math.random() * 16 - 8) + 'deg)';
+                    break;
+                case 8:
+                    btn.style.opacity = '0';
+                    setTimeout(() => {
+                        btn.style.opacity = '1';
+                    }, 150 + Math.random() * 200);
+                    break;
+                case 9:
+                    const cornerX = Math.random() > 0.5 ? Math.max(0, maxX - 20) : 0;
+                    const cornerY = Math.random() > 0.5 ? Math.max(0, maxY - 20) : 0;
+                    btn.style.position = 'relative';
+                    btn.style.left = Math.max(0, cornerX) + 'px';
+                    btn.style.top = Math.max(0, cornerY) + 'px';
+                    btn.style.transform = 'scale(0.7) rotate(' + (Math.random() * 40 - 20) + 'deg)';
+                    break;
+            }
+
+            if (Math.random() > 0.75) {
+                const texts = ['НЕТ! 😈', 'НЕА!', 'ПОПРОБУЙ!', 'АГА СЕЙЧАС!', 'НЕ ДОГОНИШЬ!', '😂', '🤪', 'НЕТ!!!'];
+                btn.textContent = texts[Math.floor(Math.random() * texts.length)];
+            }
+
+            if (Math.random() > 0.85) {
+                btn.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+            }
+
+        }, 200);
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('page2').style.display = 'none';
+        document.getElementById('page3').style.display = 'block';
+
+        const emoji = document.getElementById('resultEmoji');
+        const title = document.getElementById('resultTitle');
+        const desc = document.getElementById('resultDesc');
+
+        const maxScore = questions.length;
+        const percent = (score / maxScore) * 100;
+
+        if (percent === 100) {
+            emoji.textContent = '🏆';
+            title.textContent = 'ИДЕАЛЬНО!';
+            title.className = 'result-title gold';
+            desc.textContent = 'Ты знаешь меня как свои пять пальцев! И главное — ЛЮБИШЬ! ❤️ Ты лучший!';
+        } else if (percent >= 83) {
+            emoji.textContent = '⭐';
+            title.textContent = 'ОЧЕНЬ ХОРОШО!';
+            title.className = 'result-title silver';
+            desc.textContent = 'Ты почти идеален! И главное — любовь победила! 😘';
+        } else if (percent >= 50) {
+            emoji.textContent = '📖';
+            title.textContent = 'НЕПЛОХО!';
+            title.className = 'result-title bronze';
+            desc.textContent = 'Ты меня знаешь, но можно лучше! А любовь — это главное! 🤗';
+        } else {
+            emoji.textContent = '🤡';
+            title.textContent = 'ЭТО ПРОВАЛ...';
+            title.className = 'result-title loser';
+            desc.textContent = 'Ты меня вообще знаешь? Иди учи матчасть! Но я тебя всё равно люблю 😂😘';
+        }
+
+        desc.innerHTML += `<br><br><span style="color: #888; font-size: 0.85rem;">Правильных ответов: ${score} из ${maxScore}</span>`;
+    }
+
+    function restartQuiz() {
+        if (escapeInterval) {
+            clearInterval(escapeInterval);
+            escapeInterval = null;
+        }
+        document.getElementById('page3').style.display = 'none';
+        document.getElementById('page1').style.display = 'block';
+        currentQuestion = 0;
+        score = 0;
+        prevCorrect = null;
+        selectedOptions = [];
+        firstCorrectChosen = false;
+        buttonsSwapped = false;
+        document.getElementById('progressFill').style.width = '0%';
+    }
+</script>
+
+</body>
+</html>
